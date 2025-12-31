@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIRTUAL SPOTTER | PRO</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Teko:wght@500;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gym: {
+                            black: '#050505',    // Pitch Black
+                            dark: '#121212',     // Dark Gray
+                            yellow: '#EDFF00',   // ⚡ THE "VOLT" YELLOW ACCENT
+                            gray: '#333333',     
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Teko', 'sans-serif'], // The "BE YOUR BEST" font
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Scrollbar - Minimalist Gray */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: #333; }
+        ::-webkit-scrollbar-thumb:hover { background: #EDFF00; }
+
+        /* The "Flash" Animation - Now Yellow */
+        @keyframes flashYellow {
+            0% { border-color: rgba(255,255,255,0.1); }
+            50% { border-color: #EDFF00; box-shadow: 0 0 50px rgba(237, 255, 0, 0.6); }
+            100% { border-color: rgba(255,255,255,0.1); }
+        }
+        
+        /* ⚡ UPDATED: Thicker border and brighter glow */
+        .flash-success {
+            animation: flashYellow 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 6px solid #EDFF00 !important; 
+            box-shadow: inset 0 0 30px rgba(237, 255, 0, 0.3);
+        }
+
+        /* Diagonal Stripe Background Pattern */
+        .bg-stripes {
+            background-image: repeating-linear-gradient(
+                45deg,
+                rgba(255, 255, 255, 0.03),
+                rgba(255, 255, 255, 0.03) 10px,
+                transparent 10px,
+                transparent 20px
+            );
+        }
+    </style>
+</head>
+<body class="bg-gym-black text-white h-[100dvh] flex flex-col overflow-hidden font-sans bg-stripes">
+
+    <header class="w-full h-16 border-b border-white/10 bg-gym-black flex items-center justify-between px-8 z-50 shrink-0">
+        <div class="flex items-center gap-1 group cursor-default">
+            <div class="h-6 w-1 bg-gym-yellow skew-x-[-12deg] mr-1"></div>
+            <div class="h-6 w-1 bg-white skew-x-[-12deg] mr-3"></div>
+            
+            <h1 class="font-display text-4xl font-bold tracking-wide text-white uppercase italic leading-none pt-1">
+                Iron <span class="text-gym-yellow">Sight</span>
+            </h1>
+        </div>
+        <div class="font-display text-xl text-gray-500 tracking-widest uppercase hidden sm:block">AI PERFORMANCE TRACKER</div>
+    </header>
+
+    <main class="flex-1 grid grid-cols-12 grid-rows-[1fr_200px] gap-4 p-4 min-h-0">
+        
+        <aside class="col-span-3 row-span-2 flex flex-col gap-4 min-h-0">
+            
+            <div class="bg-gym-dark border-l-4 border-gym-yellow p-5 shadow-2xl flex flex-col gap-4 shrink-0">
+                <h2 class="font-display text-2xl text-white uppercase tracking-wider">Configuration</h2>
+                
+                <div class="relative">
+                    <select id="exerciseType" class="w-full bg-black border border-gray-700 px-4 py-3 text-sm font-bold text-white focus:border-gym-yellow focus:ring-0 outline-none appearance-none uppercase tracking-wide">
+                        <option value="squat">🏋️ Squats</option>
+                        <option value="curl">💪 Bicep Curls</option>
+                    </select>
+                    <div class="absolute right-4 top-3.5 pointer-events-none text-gym-yellow text-xs">▼</div>
+                </div>
+
+                <div class="grid grid-cols-1 gap-3">
+                    <button onclick="document.getElementById('videoUpload').click()" class="w-full bg-transparent border-2 border-white hover:bg-white hover:text-black text-white px-4 py-3 font-display text-xl uppercase tracking-wider transition-all duration-200">
+                        Upload Video
+                    </button>
+                    <input type="file" id="videoUpload" accept="video/*" class="hidden">
+
+                    <button id="camBtn" class="w-full bg-gym-yellow border-2 border-gym-yellow text-black hover:bg-white hover:border-white px-4 py-3 font-display text-xl uppercase tracking-wider transition-all duration-200 shadow-[0_0_20px_rgba(237,255,0,0.2)]">
+                        Start Live Cam
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-gym-dark border border-white/5 p-0 flex-1 flex flex-col overflow-hidden min-h-0">
+                <div class="bg-black px-5 py-3 border-b border-white/10 flex justify-between items-center shrink-0">
+                    <h2 class="font-display text-xl text-gray-400 uppercase tracking-wider">Session Log</h2>
+                    <button onclick="clearHistory()" class="text-xs text-red-500 hover:text-white font-bold uppercase tracking-widest">Clear All</button>
+                </div>
+                <div id="historyList" class="flex-1 overflow-y-auto p-4 space-y-2">
+                    <div class="text-center font-display text-xl text-gray-700 mt-10 uppercase">No data recorded</div>
+                </div>
+            </div>
+        </aside>
+
+        <section id="videoContainer" class="col-span-6 row-span-1 relative bg-black border-2 border-white/10 flex items-center justify-center min-h-0 overflow-hidden group transition-colors duration-200">
+            
+            <div class="absolute inset-0 opacity-10" style="background-image: linear-gradient(#333 1px, transparent 1px), linear-gradient(90deg, #333 1px, transparent 1px); background-size: 20px 20px;"></div>
+
+            <div id="placeholder" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-0">
+                <h1 class="font-display text-6xl md:text-8xl text-white/5 italic uppercase tracking-tighter">BE YOUR BEST</h1>
+            </div>
+
+            <img id="outputImage" class="w-full h-full object-contain relative z-10" src="" alt="">
+            
+            <video id="inputVideo" class="absolute opacity-0 w-px h-px" muted playsinline></video>
+            <video id="webcam" class="absolute opacity-0 w-px h-px" autoplay playsinline></video>
+            <canvas id="hiddenCanvas" class="hidden"></canvas>
+
+            <div class="absolute top-4 left-4 z-20">
+                <span class="px-3 py-1 bg-red-600 text-white font-display text-lg tracking-wider uppercase animate-pulse hidden" id="liveBadge">LIVE REC</span>
+            </div>
+        </section>
+
+
+        <aside class="col-span-3 row-span-1 flex flex-col gap-4 min-h-0">
+            <div class="bg-gym-yellow p-1 flex flex-col h-40 shrink-0">
+                <div class="bg-gym-black w-full h-full flex flex-col items-center justify-center relative overflow-hidden">
+                     <div class="absolute text-[10rem] font-display font-bold text-white/5 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none leading-none">88</div>
+                    
+                    <h2 class="font-display text-xl text-gym-yellow uppercase tracking-widest mb-0 z-10">Total Reps</h2>
+                    <div id="repCount" class="font-display text-8xl font-bold text-white leading-none z-10 -mt-2">0</div>
+                </div>
+            </div>
+
+            <div class="bg-gym-dark border-l-4 border-white p-5 flex-1 flex flex-col items-center justify-center text-center min-h-0">
+                <h2 class="font-display text-xl text-gray-500 uppercase tracking-widest mb-2">Trainer Feedback</h2>
+                <div id="feedback" class="font-display text-4xl md:text-5xl font-bold uppercase text-white italic leading-tight">
+                    GET READY
+                </div>
+            </div>
+        </aside>
+
+
+        <section class="col-span-9 row-span-1 bg-gym-dark border-t-4 border-gym-yellow p-4 flex flex-col min-h-0 relative">
+            <h2 class="absolute top-2 left-4 font-display text-xl text-gray-500 uppercase tracking-widest">Telemetry // Angle Data</h2>
+            <div class="flex-1 w-full relative min-h-0 mt-4">
+                <canvas id="angleChart"></canvas>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        // Toggle Live Badge Logic
+        const camBtnUI = document.getElementById('camBtn');
+        const liveBadge = document.getElementById('liveBadge');
+        camBtnUI.addEventListener('click', () => {
+            setTimeout(() => {
+                const isActive = camBtnUI.innerText.includes('Stop');
+                if(isActive) liveBadge.classList.remove('hidden');
+                else liveBadge.classList.add('hidden');
+            }, 100);
+        });
+    </script>
+</body>
+</html>

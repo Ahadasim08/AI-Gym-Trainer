@@ -1,0 +1,26 @@
+# --- 1. Python & Virtual Environment ---
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+myenv/
+.env
+
+# --- 2. Large Media Files (Too big for GitHub) ---
+*.mp4
+*.avi
+*.mov
+*.mkv
+dataset/
+assets/demo.gif 
+
+# --- 3. System Junk ---
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# --- 4. IDE & Editor Settings ---
+.vscode/
+.idea/
+*.swp
